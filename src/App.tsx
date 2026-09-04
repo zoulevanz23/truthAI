@@ -5,7 +5,6 @@ import HomePage from './pages/HomePage.tsx'
 import AnalyzerPage from './pages/AnalyzerPage.tsx'
 import AboutPage from './pages/AboutPage.tsx'
 import FeaturesPage from './pages/FeaturesPage.tsx'
-import './App.css'
 import React from 'react'
 
 // Simple global error boundary
@@ -16,16 +15,16 @@ class GlobalErrorBoundary extends React.Component<{ children: React.ReactNode },
   }
   static getDerivedStateFromError() { return { hasError: true } }
   componentDidCatch(error: unknown) { console.error('Global error boundary caught:', error) }
-  render() { return this.state.hasError ? <div style={{ padding: 24 }}>Something went wrong. Please refresh.</div> : this.props.children }
+  render() { return this.state.hasError ? <div className="p-6">Something went wrong. Please refresh.</div> : this.props.children }
 }
 
 function App() {
   return (
     <GlobalErrorBoundary>
       <Router>
-        <div className="App">
+        <div className="min-h-screen flex flex-col bg-slate-50">
           <Header />
-          <main className="main-content">
+          <main className="flex-1">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/analyzer" element={<AnalyzerPage />} />

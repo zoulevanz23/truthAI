@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import cn from 'classnames'
 
 type Variant = 'primary' | 'secondary' | 'ghost'
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -9,54 +10,29 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   disabled?: boolean
 }
 
-const styles: Record<Variant, React.CSSProperties> = {
-  primary: {
-    background: '#1D4ED8',
-    color: '#FFFFFF',
-    border: '1px solid #1D4ED8',
-    boxShadow: '0 4px 14px rgba(37,99,235,0.25)',
-  },
-  secondary: {
-    background: '#FFFFFF',
-    color: '#0F172A',
-    border: '1px solid #E2E8F0',
-    boxShadow: 'none',
-  },
-  ghost: {
-    background: 'transparent',
-    color: '#334155',
-    border: '1px solid transparent',
-    boxShadow: 'none',
-  },
+const variantClasses: Record<Variant, string> = {
+  primary: 'bg-blue-700 text-white border-blue-700 shadow-md hover:bg-blue-600',
+  secondary: 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50',
+  ghost: 'bg-transparent text-slate-600 border-transparent hover:text-slate-900',
 }
 
-export default function Button({ variant = 'primary', to, icon, children, style, disabled, ...rest }: Props) {
-  const base: React.CSSProperties = {
-    borderRadius: 9999,
-    padding: '11px 20px',
-    fontWeight: 700,
-    fontSize: 14,
-    lineHeight: 1,
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 8,
-    opacity: disabled ? 0.6 : 1,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    ...styles[variant],
-    ...(variant === 'primary' && disabled ? { background: '#F1F5F9', color: '#94A3B8', border: '1px solid #E2E8F0', boxShadow: 'none' } : {}),
-    ...style,
-  }
+export default function Button({ variant = 'primary', to, icon, children, className, disabled, ...rest }: Props) {
+  const baseClasses = cn(
+    'inline-flex items-center gap-2 px-5 py-3 font-bold text-sm leading-none rounded-full border transition-colors',
+    variantClasses[variant],
+    disabled && 'opacity-60 cursor-not-allowed bg-slate-100 text-slate-400 border-slate-200 shadow-none',
+    className
+  )
 
-  const common = { style: base, ...rest } as any
   const btn = to && !disabled ? (
-    <Link to={to} style={{ textDecoration: 'none' }}>
-      <span {...common} style={{ ...base, display: 'inline-flex' }}>
+    <Link to={to} className="no-underline">
+      <span className={baseClasses}>
         {children}
         {icon}
       </span>
     </Link>
   ) : (
-    <button disabled={disabled} {...common}>
+    <button disabled={disabled} className={baseClasses} {...rest}>
       {children}
       {icon}
     </button>
@@ -66,7 +42,7 @@ export default function Button({ variant = 'primary', to, icon, children, style,
     <motion.span
       whileHover={disabled ? {} : { y: -1 }}
       whileTap={disabled ? {} : { scale: 0.98 }}
-      style={{ display: 'inline-flex' }}
+      className="inline-flex"
     >
       {btn}
     </motion.span>

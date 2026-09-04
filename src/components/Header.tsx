@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Navbar, Nav, Container } from 'react-bootstrap'
 import { Link, useLocation } from 'react-router-dom'
 import { ShieldCheck, Menu, X } from 'lucide-react'
 import { checkServerHealth } from '../lib/api'
@@ -26,38 +25,58 @@ const Header = () => {
   const isActive = (p: string) => location.pathname === p
 
   return (
-    <header className="header-wrapper">
-      <Navbar expand="lg" className="custom-navbar" expanded={expanded}>
-        <Container style={{ maxWidth: 1280 }}>
-          <Navbar.Brand as={Link} to="/" className="brand-logo">
-            <span className="logo-container">
-              <span style={{ display:'inline-flex', width: 28, height: 28, borderRadius: 6, background:'#0F172A', alignItems:'center', justifyContent:'center' }}>
-                <ShieldCheck size={16} color="#FFFFFF" strokeWidth={2} />
-              </span>
-              <span className="brand-text">TruthCheck AI</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color:'#64748B', border:'1px solid #E2E8F0', borderRadius: 9999, padding:'2px 7px', marginLeft: 6 }}>BETA</span>
-            </span>
-          </Navbar.Brand>
+    <header className="border-b border-slate-200 bg-white">
+      <nav className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14">
+          <Link to="/" className="flex items-center gap-2 no-underline">
+            <div className="inline-flex items-center justify-center w-7 h-7 bg-slate-900 rounded-md">
+              <ShieldCheck size={16} color="#FFFFFF" strokeWidth={2} />
+            </div>
+            <span className="text-slate-900 font-semibold">TruthCheck AI</span>
+            <span className="text-xs font-semibold text-slate-500 border border-slate-200 rounded-full px-2 py-0.5 ml-1">BETA</span>
+          </Link>
 
-          <Navbar.Toggle aria-controls="main-nav" className="custom-toggler" onClick={() => setExpanded(!expanded)}>
+          <button
+            className="lg:hidden p-2 rounded-md hover:bg-slate-100"
+            onClick={() => setExpanded(!expanded)}
+            aria-label="Toggle menu"
+          >
             {expanded ? <X size={18} /> : <Menu size={18} />}
-          </Navbar.Toggle>
+          </button>
 
-          <Navbar.Collapse id="main-nav">
-            <Nav className="ms-auto align-items-center" style={{ gap: 12 }}>
-              <Nav.Link as={Link as any} to="/" className={`nav-link-custom ${isActive('/') ? 'active' : ''}`} onClick={() => setExpanded(false)}>Verify</Nav.Link>
-              <Nav.Link as={Link as any} to="/features" className={`nav-link-custom ${isActive('/features') ? 'active' : ''}`} onClick={() => setExpanded(false)}>How it works</Nav.Link>
-              <Nav.Link as={Link as any} to="/about" className={`nav-link-custom ${isActive('/about') ? 'active' : ''}`} onClick={() => setExpanded(false)}>About</Nav.Link>
-              <span style={{ width: 1, height: 20, background:'#E2E8F0', margin:'0 12px', display:'inline-block' }} />
-              <span aria-label="server-health" title="Server health" style={{ display:'inline-flex', alignItems:'center', gap: 6, fontSize: 12, fontWeight: 500, color: serverHealthy ? '#059669' : serverHealthy === false ? '#DC2626' : '#64748B', fontFamily:'var(--font-mono)' }}>
-                <span style={{ width:7, height:7, borderRadius: 9999, background: serverHealthy ? '#059669' : serverHealthy === false ? '#DC2626' : '#CBD5E1', display:'inline-block' }} />
-                {serverHealthy == null ? 'Checking' : serverHealthy ? 'Operational' : 'Offline'}
-              </span>
-              <Button to="/analyzer" variant="primary" onClick={() => setExpanded(false)} style={{ padding:'10px 18px', fontSize:13, marginLeft: 12 }}>Open analyzer</Button>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+          <div className={`${expanded ? 'flex' : 'hidden'} lg:flex lg:items-center lg:gap-3 absolute lg:static top-14 left-0 right-0 bg-white lg:bg-transparent border-t lg:border-t-0 border-slate-200 lg:border-0 p-4 lg:p-0 flex-col lg:flex-row shadow-lg lg:shadow-none`}>
+            <Link
+              to="/"
+              className={`text-sm font-medium no-underline ${isActive('/') ? 'text-slate-900' : 'text-slate-600 hover:text-slate-900'}`}
+              onClick={() => setExpanded(false)}
+            >
+              Verify
+            </Link>
+            <Link
+              to="/features"
+              className={`text-sm font-medium no-underline ${isActive('/features') ? 'text-slate-900' : 'text-slate-600 hover:text-slate-900'}`}
+              onClick={() => setExpanded(false)}
+            >
+              How it works
+            </Link>
+            <Link
+              to="/about"
+              className={`text-sm font-medium no-underline ${isActive('/about') ? 'text-slate-900' : 'text-slate-600 hover:text-slate-900'}`}
+              onClick={() => setExpanded(false)}
+            >
+              About
+            </Link>
+            <div className="hidden lg:block w-px h-5 bg-slate-200 mx-3" />
+            <div className="flex items-center gap-2 text-xs font-medium font-mono" style={{ color: serverHealthy ? '#059669' : serverHealthy === false ? '#DC2626' : '#64748B' }}>
+              <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: serverHealthy ? '#059669' : serverHealthy === false ? '#DC2626' : '#CBD5E1' }} />
+              {serverHealthy == null ? 'Checking' : serverHealthy ? 'Operational' : 'Offline'}
+            </div>
+            <Button to="/analyzer" variant="primary" onClick={() => setExpanded(false)} className="px-4 py-2.5 text-xs ml-2">
+              Open analyzer
+            </Button>
+          </div>
+        </div>
+      </nav>
     </header>
   )
 }
