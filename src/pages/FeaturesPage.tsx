@@ -1,101 +1,92 @@
-import { Container, Row, Col } from 'react-bootstrap'
 import { ShieldCheck, Search, Link2, Mail, Newspaper } from 'lucide-react'
 import Button from '../components/ui/Button'
 
 export default function FeaturesPage() {
   return (
-    <div style={{ background:'#F8FAFC' }}>
-      <section style={{ background:'#FFFFFF', borderBottom:'1px solid #E2E8F0' }}>
-        <Container style={{ maxWidth: 1120, paddingTop: 72, paddingBottom: 48 }}>
-          <div style={{ maxWidth: 720 }}>
-            <div style={{ fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'#64748B', marginBottom:12 }}>How it works</div>
-            <h1 style={{ fontSize:'clamp(28px,4vw,38px)', fontWeight:750, lineHeight:1.05, letterSpacing:'-0.03em', color:'#0F172A', margin:0 }}>
+    <div className="bg-slate-50">
+      <section className="bg-white border-b border-slate-200">
+        <div className="max-w-[1120px] mx-auto px-6 py-[72px_48px]">
+          <div className="max-w-[720px]">
+            <div className="text-[11px] font-bold tracking-widest uppercase text-slate-500 mb-3">How it works</div>
+            <h1 className="text-[clamp(28px,4vw,38px)] font-extrabold leading-tight tracking-tight text-slate-900 m-0">
               A short check with a clear output.
             </h1>
-            <p style={{ fontSize:17, color:'#475569', lineHeight:1.65, marginTop:14, maxWidth: 640 }}>
+            <p className="text-[17px] text-slate-600 leading-relaxed mt-3.5 max-w-[640px]">
               Paste what you received. Get the same structure every time — verdict, confidence, explanation and signals. No chat, no extra steps.
             </p>
           </div>
-        </Container>
+        </div>
       </section>
 
-      <section style={{ background:'#F8FAFC', borderBottom:'1px solid #E2E8F0' }}>
-        <Container style={{ maxWidth: 1120, padding:'24px 12px' }}>
-          <Row style={{ rowGap:16 }}>
+      <section className="bg-slate-50 border-b border-slate-200">
+        <div className="max-w-[1120px] mx-auto px-6 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               { n:'01', t:'Choose a type', d:'Message, link, article or document. Each has a tailored check.' },
               { n:'02', t:'Add context', d:'Include the full text, sender or headline for a better read.' },
               { n:'03', t:'Get the result', d:'Same format every time, built for quick decisions.' },
             ].map(s=>(
-              <Col key={s.n} md={4}>
-                <div style={{ background:'#FFFFFF', border:'1px solid #E2E8F0', borderRadius:12, padding:16, display:'flex', gap:12, alignItems:'flex-start' }}>
-                  <span style={{ fontFamily:'var(--font-mono)', fontSize:11, fontWeight:700, color:'#2563EB', background:'#EFF6FF', border:'1px solid #DBEAFE', borderRadius:8, padding:'4px 7px', lineHeight:1 }}>{s.n}</span>
-                  <div>
-                    <div style={{ fontSize:14, fontWeight:650, color:'#0F172A', marginBottom:4 }}>{s.t}</div>
-                    <div style={{ fontSize:13, color:'#475569', lineHeight:1.5 }}>{s.d}</div>
-                  </div>
+              <div key={s.n} className="bg-white border border-slate-200 rounded-xl p-4 flex gap-3 items-start">
+                <span className="font-mono text-[11px] font-bold text-blue-600 bg-blue-50 border border-blue-200 rounded-lg px-1.5 py-1 leading-none">{s.n}</span>
+                <div>
+                  <div className="text-sm font-bold text-slate-900 mb-1">{s.t}</div>
+                  <div className="text-sm text-slate-600 leading-relaxed">{s.d}</div>
                 </div>
-              </Col>
+              </div>
             ))}
-          </Row>
-        </Container>
+          </div>
+        </div>
       </section>
 
-      <section style={{ background:'#FFFFFF', borderBottom:'1px solid #E2E8F0' }}>
-        <Container style={{ maxWidth: 1120, paddingTop: 48, paddingBottom: 32 }}>
-          <h2 style={{ fontSize:18, fontWeight:700, letterSpacing:'-0.02em', color:'#0F172A', margin:'0 0 16px' }}>What gets checked</h2>
-          <Row style={{ rowGap:16 }}>
+      <section className="bg-white border-b border-slate-200">
+        <div className="max-w-[1120px] mx-auto px-6 py-12 pb-8">
+          <h2 className="text-lg font-bold tracking-tight text-slate-900 m-0 mb-4">What gets checked</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               { icon:<Mail size={16}/>, title:'Message', desc:'Urgent language, credential requests and sender mismatches.' },
               { icon:<Link2 size={16}/>, title:'Link', desc:'URL shape, redirects and signals before you click.' },
               { icon:<Newspaper size={16}/>, title:'Article', desc:'Claim framing, sourcing and language that pressures a quick share.' },
             ].map(c=>(
-              <Col key={c.title} md={4}>
-                <div style={{ background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:12, padding:18, height:'100%' }}>
-                  <div style={{ width:32, height:32, borderRadius:8, background:'#FFFFFF', border:'1px solid #E2E8F0', display:'inline-flex', alignItems:'center', justifyContent:'center', color:'#0F172A', marginBottom:10 }}>{c.icon}</div>
-                  <div style={{ fontSize:14, fontWeight:650, color:'#0F172A', marginBottom:6 }}>{c.title}</div>
-                  <div style={{ fontSize:13, color:'#475569', lineHeight:1.6 }}>{c.desc}</div>
-                </div>
-              </Col>
+              <div key={c.title} className="bg-slate-50 border border-slate-200 rounded-xl p-4.5 h-full">
+                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 inline-flex items-center justify-center text-slate-900 mb-2.5">{c.icon}</div>
+                <div className="text-sm font-bold text-slate-900 mb-1.5">{c.title}</div>
+                <div className="text-sm text-slate-600 leading-relaxed">{c.desc}</div>
+              </div>
             ))}
-          </Row>
-        </Container>
+          </div>
+        </div>
       </section>
 
-      <section style={{ background:'#F8FAFC' }}>
-        <Container style={{ maxWidth: 1120, paddingTop: 48, paddingBottom: 48 }}>
-          <Row style={{ rowGap:16 }}>
-            <Col lg={6}>
-              <div style={{ background:'#FFFFFF', border:'1px solid #E2E8F0', borderRadius:12, padding:20, height:'100%' }}>
-                <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:10 }}>
-                  <span style={{ width:28, height:28, borderRadius:8, background:'#F8FAFC', border:'1px solid #E2E8F0', display:'inline-flex', alignItems:'center', justifyContent:'center', color:'#0F172A' }}><ShieldCheck size={16}/></span>
-                  <div style={{ fontSize:14, fontWeight:650, color:'#0F172A' }}>Private by default</div>
-                </div>
-                <ul style={{ margin:0, paddingLeft:18, fontSize:13, color:'#475569', lineHeight:1.7 }}>
-                  <li>No account, no storage — content is discarded.</li>
-                  <li>Rate limits and basic validation on the server.</li>
-                  <li>History, if shown, lives only in your browser.</li>
-                </ul>
+      <section className="bg-slate-50">
+        <div className="max-w-[1120px] mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="bg-white border border-slate-200 rounded-xl p-5 h-full">
+              <div className="flex gap-2.5 items-center mb-2.5">
+                <span className="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 inline-flex items-center justify-center text-slate-900"><ShieldCheck size={16}/></span>
+                <div className="text-sm font-bold text-slate-900">Private by default</div>
               </div>
-            </Col>
-            <Col lg={6}>
-              <div style={{ background:'#FFFFFF', border:'1px solid #E2E8F0', borderRadius:12, padding:20, height:'100%' }}>
-                <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:10 }}>
-                  <span style={{ width:28, height:28, borderRadius:8, background:'#F8FAFC', border:'1px solid #E2E8F0', display:'inline-flex', alignItems:'center', justifyContent:'center', color:'#0F172A' }}><Search size={16}/></span>
-                  <div style={{ fontSize:14, fontWeight:650, color:'#0F172A' }}>Consistent output</div>
-                </div>
-                <ul style={{ margin:0, paddingLeft:18, fontSize:13, color:'#475569', lineHeight:1.7 }}>
-                  <li>Verdict with calibrated confidence.</li>
-                  <li>Plain-language explanation.</li>
-                  <li>Signals you can check yourself.</li>
-                </ul>
+              <ul className="m-0 pl-4.5 text-sm text-slate-600 leading-[1.7]">
+                <li>No account, no storage — content is discarded.</li>
+                <li>Rate limits and basic validation on the server.</li>
+                <li>History, if shown, lives only in your browser.</li>
+              </ul>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl p-5 h-full">
+              <div className="flex gap-2.5 items-center mb-2.5">
+                <span className="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 inline-flex items-center justify-center text-slate-900"><Search size={16}/></span>
+                <div className="text-sm font-bold text-slate-900">Consistent output</div>
               </div>
-            </Col>
-          </Row>
-          <div style={{ textAlign:'center', marginTop:28 }}>
+              <ul className="m-0 pl-4.5 text-sm text-slate-600 leading-[1.7]">
+                <li>Verdict with calibrated confidence.</li>
+                <li>Plain-language explanation.</li>
+                <li>Signals you can check yourself.</li>
+              </ul>
+            </div>
+          </div>
+          <div className="text-center mt-7">
             <Button to="/analyzer" variant="primary">Try it now</Button>
           </div>
-        </Container>
+        </div>
       </section>
     </div>
   )

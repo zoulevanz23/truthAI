@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Form, Alert } from 'react-bootstrap'
 import { Mail, Link2, Newspaper, FileText, ArrowRight, ShieldCheck, AlertTriangle, XCircle } from 'lucide-react'
 import { analyzeContent, type AnalysisResponse } from '../lib/api'
 import ResultCard from './ResultCard'
@@ -49,16 +48,16 @@ const InputForm = () => {
   const count = file ? (file.name + ' • ' + (file.size/1024).toFixed(1) + ' KB') : `${input.length} / 10,000`
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto' }}>
+    <div className="max-w-[720px] mx-auto">
       {/* Workspace header — primary hierarchy */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform:'uppercase', color:'#64748B', marginBottom: 8 }}>Verification workspace</div>
-        <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing:'-0.02em', color:'#0F172A', margin: 0, lineHeight: 1.15 }}>What do you want to verify?</h1>
-        <p style={{ fontSize: 15, color:'#475569', margin: '8px 0 0', maxWidth: 640 }}>Choose a content type, paste the full context, and run a structured check. No account required.</p>
+      <div className="mb-6">
+        <div className="text-[11px] font-bold tracking-widest uppercase text-slate-500 mb-2">Verification workspace</div>
+        <h1 className="text-[28px] font-bold tracking-tight text-slate-900 m-0 leading-tight">What do you want to verify?</h1>
+        <p className="text-[15px] text-slate-600 mt-2 max-w-[640px]">Choose a content type, paste the full context, and run a structured check. No account required.</p>
       </div>
 
       {/* Type selector — restrained segmented control, no color pills */}
-      <div role="tablist" aria-label="Analysis type" style={{ display:'flex', gap: 8, flexWrap:'wrap', marginBottom: 16 }}>
+      <div role="tablist" aria-label="Analysis type" className="flex gap-2 flex-wrap mb-4">
         {(Object.keys(typeMeta) as AnalysisType[]).map(k => {
           const active = k === type
           const m = typeMeta[k]
@@ -68,103 +67,96 @@ const InputForm = () => {
               role="tab"
               aria-selected={active}
               onClick={() => setType(k)}
-              style={{
-                display:'inline-flex', alignItems:'center', gap: 8,
-                padding:'9px 14px', borderRadius: 8,
-                border: active ? '1px solid #0F172A' : '1px solid #E2E8F0',
-                background: active ? '#0F172A' : '#FFFFFF',
-                color: active ? '#FFFFFF' : '#334155',
-                fontSize: 13, fontWeight: 600, cursor:'pointer'
-              }}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border text-sm font-semibold cursor-pointer transition-colors ${
+                active 
+                  ? 'border-slate-900 bg-slate-900 text-white' 
+                  : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+              }`}
             >
-              <span style={{ opacity: active ? 1 : 0.9, display:'inline-flex' }}>{m.icon}</span>
+              <span className={`inline-flex ${active ? 'opacity-100' : 'opacity-90'}`}>{m.icon}</span>
               {m.label}
             </button>
           )
         })}
       </div>
-      <div style={{ fontSize: 13, color:'#64748B', marginBottom: 16, display:'flex', alignItems:'center', gap: 6 }}>
+      <div className="text-sm text-slate-500 mb-4 flex items-center gap-1.5">
         <ShieldCheck size={14} /> {meta.helper}
       </div>
 
       {/* Workspace surface — single bordered surface, not giant card stack */}
-      <div style={{ background:'#FFFFFF', border:'1px solid #E2E8F0', borderRadius: 12, overflow:'hidden' }}>
-        <Form onSubmit={handleSubmit} style={{ margin: 0 }}>
-          <div style={{ padding: 16, borderBottom:'1px solid #F1F5F9', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color:'#0F172A' }}>Content</span>
-            <span style={{ fontSize: 12, color:'#94A3B8', fontFamily:'var(--font-mono)' }}>{count}</span>
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+        <form onSubmit={handleSubmit} className="m-0">
+          <div className="px-4 py-4 border-b border-slate-100 flex justify-between items-center">
+            <span className="text-sm font-semibold text-slate-900">Content</span>
+            <span className="text-xs text-slate-400 font-mono">{count}</span>
           </div>
 
-          <div style={{ padding: 16 }}>
-            <Form.Control
-              as="textarea"
+          <div className="p-4">
+            <textarea
               rows={7}
               value={input}
               onChange={e => setInput(e.target.value)}
               placeholder={meta.placeholder}
               maxLength={10000}
               disabled={isLoading}
-              style={{
-                border:'1px solid #E2E8F0', borderRadius: 8, padding: 14,
-                fontSize: type==='link' ? 13 : 14,
-                fontFamily: type==='link' ? 'var(--font-mono)' : 'var(--font-sans)',
-                background: '#FFFFFF', color:'#0F172A', boxShadow:'none'
-              }}
+              className={`w-full border border-slate-200 rounded-lg p-3.5 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                type === 'link' ? 'text-[13px] font-mono' : 'text-[14px]'
+              }`}
             />
             {input.length > 9000 && (
-              <div style={{ display:'flex', gap: 6, alignItems:'center', marginTop: 8, fontSize: 12, color:'#D97706' }}>
+              <div className="flex gap-1.5 items-center mt-2 text-xs text-amber-600">
                 <AlertTriangle size={14} /> Approaching limit
               </div>
             )}
 
-            <div style={{ marginTop: 12, display:'flex', alignItems:'center', gap: 12, flexWrap:'wrap' }}>
-              <label style={{ fontSize: 13, color:'#475569', display:'inline-flex', alignItems:'center', gap: 8, cursor:'pointer' }}>
-                <input type="file" accept=".txt,.pdf,.docx" style={{ display:'none' }} onChange={e => { const f=e.target.files?.[0]; if(f) setFile(f) }} />
-                <span style={{ border:'1px solid #E2E8F0', borderRadius: 8, padding:'7px 10px', background:'#F8FAFC', fontWeight: 600, fontSize: 12 }}>Attach file</span>
-                <span style={{ fontSize: 12, color:'#94A3B8' }}>.txt preferred • PDF/DOCX: copy text</span>
+            <div className="mt-3 flex items-center gap-3 flex-wrap">
+              <label className="text-sm text-slate-600 inline-flex items-center gap-2 cursor-pointer">
+                <input type="file" accept=".txt,.pdf,.docx" className="hidden" onChange={e => { const f=e.target.files?.[0]; if(f) setFile(f) }} />
+                <span className="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 font-semibold text-xs">Attach file</span>
+                <span className="text-xs text-slate-400">.txt preferred • PDF/DOCX: copy text</span>
               </label>
               {file && (
-                <span style={{ fontSize: 12, color:'#334155', background:'#F1F5F9', border:'1px solid #E2E8F0', borderRadius: 9999, padding:'4px 8px', display:'inline-flex', gap: 6, alignItems:'center' }}>
-                  {file.name} <button type="button" onClick={() => setFile(null)} style={{ border:'none', background:'transparent', color:'#64748B', cursor:'pointer', padding:0, lineHeight:1 }}><XCircle size={14} /></button>
+                <span className="text-xs text-slate-700 bg-slate-100 border border-slate-200 rounded-full px-2 py-1 inline-flex gap-1.5 items-center">
+                  {file.name} <button type="button" onClick={() => setFile(null)} className="border-none bg-transparent text-slate-500 cursor-pointer p-0 leading-none"><XCircle size={14} /></button>
                 </span>
               )}
             </div>
           </div>
 
-          <div style={{ padding:'12px 16px', background:'#F8FAFC', borderTop:'1px solid #E2E8F0', display:'flex', justifyContent:'flex-end', alignItems:'center', gap: 12 }}>
-            <span style={{ fontSize: 12, color:'#94A3B8' }}>{isLoading ? 'Verifying…' : 'No data is stored'}</span>
+          <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 flex justify-end items-center gap-3">
+            <span className="text-xs text-slate-400">{isLoading ? 'Verifying…' : 'No data is stored'}</span>
             <Button type="submit" disabled={!canSubmit} variant={canSubmit ? 'primary' : 'secondary'} icon={<ArrowRight size={16} />}>
               {isLoading ? 'Analyzing…' : 'Analyze'}
             </Button>
           </div>
-        </Form>
+        </form>
       </div>
 
       {/* States — restrained */}
       {error && (
-        <Alert variant="danger" style={{ marginTop: 16, background:'#FEF2F2', border:'1px solid #FECACA', color:'#7F1D1D', borderRadius: 8, padding: 12, display:'flex', gap: 8, alignItems:'center' }}>
+        <div className="mt-4 bg-red-50 border border-red-200 text-red-900 rounded-lg p-3 flex gap-2 items-center">
           <XCircle size={16} /> {error}
-        </Alert>
+        </div>
       )}
       {isLoading && (
-        <div style={{ marginTop: 16, background:'#FFFFFF', border:'1px solid #E2E8F0', borderRadius: 12, padding: 16, display:'flex', alignItems:'center', gap: 12 }}>
+        <div className="mt-4 bg-white border border-slate-200 rounded-lg p-4 flex items-center gap-3">
           <Loader />
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color:'#0F172A' }}>Running verification</div>
-            <div style={{ fontSize: 12, color:'#64748B' }}>Cross-checking patterns and signals…</div>
+            <div className="text-sm font-semibold text-slate-900">Running verification</div>
+            <div className="text-xs text-slate-500">Cross-checking patterns and signals…</div>
           </div>
         </div>
       )}
       {result && (
-        <div style={{ marginTop: 16 }}>
+        <div className="mt-4">
           <ResultCard result={result} />
         </div>
       )}
 
       {/* Secondary info — tertiary hierarchy, not competing card */}
-      <div style={{ marginTop: 24, paddingTop: 16, borderTop:'1px solid #F1F5F9' }}>
-        <div style={{ fontSize: 12, fontWeight: 600, color:'#475569', marginBottom: 8 }}>How to get a better result</div>
-        <ul style={{ margin:0, paddingLeft: 18, color:'#64748B', fontSize: 13, lineHeight: 1.6 }}>
+      <div className="mt-6 pt-4 border-t border-slate-100">
+        <div className="text-xs font-semibold text-slate-600 mb-2">How to get a better result</div>
+        <ul className="m-0 pl-4.5 text-slate-500 text-sm leading-relaxed">
           <li>Include the complete message, sender and subject for emails.</li>
           <li>For links, paste the exact URL. Shortened links are automatically expanded.</li>
           <li>For articles, include headline and the specific claim to check.</li>

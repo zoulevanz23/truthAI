@@ -1,36 +1,35 @@
-import { Container } from 'react-bootstrap'
 import InputForm from '../components/InputForm'
 import { ShieldCheck } from 'lucide-react'
 
 const AnalyzerPage = () => {
   return (
-    <div style={{ background:'#F8FAFC', minHeight:'calc(100vh - 56px)' }}>
-      <Container style={{ maxWidth: 1120, paddingTop: 48, paddingBottom: 64 }}>
-        <div style={{ display:'flex', alignItems:'center', gap: 8, fontSize: 12, color:'#64748B', marginBottom: 12 }}>
-          <span style={{ display:'inline-flex', alignItems:'center', gap: 6, background:'#FFFFFF', border:'1px solid #E2E8F0', borderRadius: 9999, padding:'4px 8px', fontWeight:600 }}>
+    <div className="bg-slate-50 min-h-[calc(100vh-56px)]">
+      <div className="max-w-[1120px] mx-auto px-6 py-12 pb-16">
+        <div className="flex items-center gap-2 text-xs text-slate-500 mb-3">
+          <span className="inline-flex items-center gap-1.5 bg-white border border-slate-200 rounded-full px-2 py-1 font-semibold">
             <ShieldCheck size={14} /> Privacy-first • No data stored
           </span>
-          <span style={{ color:'#CBD5E1' }}>•</span>
+          <span className="text-slate-300">•</span>
           <span>Results in seconds</span>
         </div>
 
         <InputForm />
 
-        <div style={{ maxWidth: 720, margin:'32px auto 0', display:'grid', gridTemplateColumns:'1fr 1fr', gap: 16 }}>
-          <div style={{ background:'#FFFFFF', border:'1px solid #E2E8F0', borderRadius: 12, padding: 16 }}>
-            <div style={{ fontSize: 12, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', color:'#64748B', marginBottom: 6 }}>How it works</div>
-            <ol style={{ margin:0, paddingLeft: 18, fontSize:13, color:'#475569', lineHeight:1.6 }}>
+        <div className="max-w-[720px] mx-auto mt-8 grid grid-cols-2 gap-4">
+          <div className="bg-white border border-slate-200 rounded-xl p-4">
+            <div className="text-xs font-bold tracking-wider uppercase text-slate-500 mb-1.5">How it works</div>
+            <ol className="m-0 pl-4.5 text-sm text-slate-600 leading-relaxed">
               <li>Choose type and paste content</li>
               <li>We run heuristic and AI checks</li>
               <li>Get verdict, confidence and signals</li>
             </ol>
           </div>
-          <div style={{ background:'#FFFFFF', border:'1px solid #E2E8F0', borderRadius: 12, padding: 16 }}>
-            <div style={{ fontSize: 12, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', color:'#64748B', marginBottom: 6 }}>Trust & privacy</div>
-            <p style={{ margin:0, fontSize:13, color:'#475569', lineHeight:1.6 }}>No login. Content is analyzed and discarded. Rate-limited and validated on the server. Always cross-check important decisions.</p>
+          <div className="bg-white border border-slate-200 rounded-xl p-4">
+            <div className="text-xs font-bold tracking-wider uppercase text-slate-500 mb-1.5">Trust & privacy</div>
+            <p className="m-0 text-sm text-slate-600 leading-relaxed">No login. Content is analyzed and discarded. Rate-limited and validated on the server. Always cross-check important decisions.</p>
           </div>
         </div>
-      </Container>
+      </div>
     </div>
   )
 }
