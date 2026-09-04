@@ -36,7 +36,7 @@ export default function AboutPage() {
                 <div className="text-[11px] font-bold tracking-wider uppercase text-slate-500 mb-1.5">{s.k}</div>
                 <div className="text-sm font-bold text-slate-900 leading-relaxed">{s.v}</div>
                 <div className="text-sm text-slate-500 mt-1">{s.d}</div>
-              </div>
+                </div>
             ))}
           </div>
         </div>
@@ -56,21 +56,21 @@ export default function AboutPage() {
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
               <div className="text-xs font-bold tracking-wider uppercase text-slate-500 mb-2.5">What you get</div>
               <div className="grid gap-2.5">
-                {[
-                  { icon:<ShieldCheck size={16}/>, title:'Verdict', desc:'Safe · Suspicious · Scam with calibrated confidence.' },
-                  { icon:<FileText size={16}/>, title:'Explanation', desc:'Plain language why, not just a label.' },
-                  { icon:<Cpu size={16}/>, title:'Signals', desc:'Checkable cues you can verify yourself.' },
-                ].map(r=>(
+                  {[
+                    { icon:<ShieldCheck size={16}/>, title:'Verdict', desc:'Safe · Suspicious · Scam with calibrated confidence.' },
+                    { icon:<FileText size={16}/>, title:'Explanation', desc:'Plain language why, not just a label.' },
+                    { icon:<Cpu size={16}/>, title:'Signals', desc:'Checkable cues you can verify yourself.' },
+                  ].map(r=>(
                   <div key={r.title} className="flex gap-3 items-start bg-white border border-slate-200 rounded-lg p-3">
                     <span className="w-7 h-7 rounded-lg bg-white border border-slate-200 inline-flex items-center justify-center text-slate-900 flex-shrink-0">{r.icon}</span>
-                    <div>
+                      <div>
                       <div className="text-sm font-bold text-slate-900">{r.title}</div>
                       <div className="text-sm text-slate-500">{r.desc}</div>
                     </div>
-                  </div>
-                ))}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
           </div>
         </div>
       </section>
@@ -92,7 +92,7 @@ export default function AboutPage() {
                 <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 inline-flex items-center justify-center text-slate-900 mb-2.5">{v.icon}</div>
                 <div className="text-sm font-bold text-slate-900 mb-1.5">{v.t}</div>
                 <div className="text-sm text-slate-600 leading-relaxed">{v.d}</div>
-              </div>
+                </div>
             ))}
           </div>
         </div>
