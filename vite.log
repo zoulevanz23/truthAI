@@ -1,0 +1,75 @@
+
+> truthcheck-ai@0.0.0 dev
+> vite --port 3000
+
+
+  [32m[1mVITE[22m v5.4.19[39m  [2mready in [0m[1m335[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m3000[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.2.158:[1m3000[22m/[39m
+[2m8:30:26 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Header.tsx[22m
+[2m8:30:33 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/InputForm.tsx[22m
+[2m8:30:40 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.css[22m
+[2m8:31:26 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:31:34 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:31:41 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:31:49 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Header.tsx[22m
+[2m8:32:06 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Header.tsx[22m
+[2m8:32:18 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/FeaturesPage.tsx[22m
+[2m8:32:23 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/FeaturesPage.tsx[22m
+[2m8:32:29 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/InputForm.tsx[22m
+[2m8:32:35 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/InputForm.tsx[22m
+[2m8:32:52 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:33:19 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:33:59 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ui/Button.tsx[22m
+[2m8:34:07 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ui/Button.tsx[22m
+[2m8:34:15 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.css[22m
+[2m8:34:22 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.css[22m
+[2m8:34:27 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.css[22m
+[2m8:36:32 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:36:40 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:36:48 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:36:55 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:37:02 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Header.tsx[22m
+[2m8:37:52 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/AboutPage.tsx[22m
+[2m8:38:41 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:38:46 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:38:53 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:38:58 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.css[22m
+[2m8:40:01 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/FeaturesPage.tsx[22m
+[2m8:40:36 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:40:56 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/FeaturesPage.tsx[22m
+[2m8:43:38 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:45:00 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:46:21 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m8:48:17 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m9:14:49 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m9:15:02 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m9:15:08 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.css[22m
+[2m9:20:05 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+[2m9:23:14 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx[22m
+node:internal/fs/watchers:323
+    const error = new UVException({
+                  ^
+
+Error: EBUSY: resource busy or locked, watch 'C:\Users\c00383\OneDrive - Aisin Asia Pacific Co., Ltd\Desktop\Systems\truthcheck-ai-main\Vid\truth.mp4'
+    at FSWatcher.<computed> (node:internal/fs/watchers:323:19)
+    at Object.watch (node:fs:3062:36)
+    at createFsWatchInstance (file:///C:/Users/c00383/OneDrive%20-%20Aisin%20Asia%20Pacific%20Co.,%20Ltd/Desktop/Systems/truthcheck-ai-main/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:42780:17)
+    at setFsWatchListener (file:///C:/Users/c00383/OneDrive%20-%20Aisin%20Asia%20Pacific%20Co.,%20Ltd/Desktop/Systems/truthcheck-ai-main/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:42827:15)
+    at NodeFsHandler._watchWithNodeFs (file:///C:/Users/c00383/OneDrive%20-%20Aisin%20Asia%20Pacific%20Co.,%20Ltd/Desktop/Systems/truthcheck-ai-main/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:42982:14)
+    at NodeFsHandler._handleFile (file:///C:/Users/c00383/OneDrive%20-%20Aisin%20Asia%20Pacific%20Co.,%20Ltd/Desktop/Systems/truthcheck-ai-main/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:43046:23)
+    at NodeFsHandler._addToNodeFs (file:///C:/Users/c00383/OneDrive%20-%20Aisin%20Asia%20Pacific%20Co.,%20Ltd/Desktop/Systems/truthcheck-ai-main/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:43288:21)
+Emitted 'error' event on FSWatcher instance at:
+    at FSWatcher._handleError (file:///C:/Users/c00383/OneDrive%20-%20Aisin%20Asia%20Pacific%20Co.,%20Ltd/Desktop/Systems/truthcheck-ai-main/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:44481:10)
+    at NodeFsHandler._addToNodeFs (file:///C:/Users/c00383/OneDrive%20-%20Aisin%20Asia%20Pacific%20Co.,%20Ltd/Desktop/Systems/truthcheck-ai-main/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:43296:18) {
+  errno: -4082,
+  syscall: 'watch',
+  code: 'EBUSY',
+  path: 'C:\\Users\\c00383\\OneDrive - Aisin Asia Pacific Co., Ltd\\Desktop\\Systems\\truthcheck-ai-main\\Vid\\truth.mp4',
+  filename: 'C:\\Users\\c00383\\OneDrive - Aisin Asia Pacific Co., Ltd\\Desktop\\Systems\\truthcheck-ai-main\\Vid\\truth.mp4'
+}
+
+Node.js v26.4.0
+
+C:\Users\c00383\OneDrive - Aisin Asia Pacific Co., Ltd\Desktop\Systems\truthcheck-ai-main>

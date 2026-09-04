@@ -1,0 +1,80 @@
+/* ============================================================
+   InputForm — Analysis Form with Segmented Control
+   ============================================================ */
+.form-control-modern {
+  --bg-input: var(--bg-surface);
+  --border-input: var(--border-subtle);
+  --focus-bg: var(--bg-surface-raised);
+  --focus-border: var(--blue-primary);
+  --focus-shadow: 0 0 0 3px rgba(46, 94, 255, 0.1);
+}
+
+.form-control-modern:focus {
+  background: var(--focus-bg);
+  border-color: var(--focus-border);
+  box-shadow: var(--focus-shadow);
+  outline: none;
+}
+
+/* Textarea with console-like appearance */
+.form-control-modern[rows] {
+  padding: var(--spacing-md);
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: 0;
+  color: var(--text-primary);
+  font-family: "JetBrains Mono", "IBM Plex Mono", monospace;
+  font-size: var(--font-scale-base);
+  resize: vertical;
+}
+
+.form-control-modern:focus {
+  --focus-shadow: 0 0 0 3px rgba(46, 94, 255, 0.15);
+}
+
+/* Analysis type selector — segmented pill control */
+.analysis-type-buttons .btn {
+  --btn-bg: var(--bg-surface);
+  --btn-border: var(--border-subtle);
+  --btn-text: var(--text-secondary);
+  margin: 0 2px 2px 0;
+  border-radius: 0;
+}
+
+.analysis-type-buttons .btn.active {
+  --btn-bg: var(--blue-primary);
+  --btn-text: var(--white);
+  --btn-border: var(--blue-primary);
+  color: var(--white);
+}
+
+/* Input form card background */
+.analysis-card {
+  --card-bg: var(--bg-surface);
+  --card-border: var(--border-subtle);
+}
+
+/* File input custom styling */
+.FileInput {
+  --file-bg: var(--bg-surface);
+  --file-border: var(--border-subtle);
+}
+
+/* Pro tips list */
+.tips-list li {
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.6;
+}
+
+/* Submit button — full width with glow */
+.submit-button {
+  --btn-bg: var(--blue-primary);
+  --btn-text: var(--white);
+  --btn-hover-bg: var(--blue-glow);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.submit-button:hover {
+  --btn-bg: var(--blue-glow);
+  color: var(--bg-void);
+}
