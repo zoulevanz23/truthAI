@@ -1,4 +1,4 @@
-# 🛡️ TruthCheck AI — Premium Verification SaaS
+# 🛡️ TruthCheck AI
 
 ![React](https://img.shields.io/badge/React-18%20%7C%20TypeScript-0F172A)
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF)
