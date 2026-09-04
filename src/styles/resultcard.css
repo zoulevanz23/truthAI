@@ -1,0 +1,77 @@
+/* ============================================================
+   ResultCard — Verdict Display with Confidence Meter
+   ============================================================ */
+.verdict-badge {
+  --verdict-color: var(--verdict-scam, var(--verdict-suspicious, var(--verdict-safe)));
+  --verdict-bg: calc(var(--verdict-color));
+  --verdict-icon-stroke: var(--verdict-color);
+}
+
+.verdict-badge .verdict-icon {
+  stroke: var(--verdict-icon-stroke);
+}
+
+/* Confidence meter — monospace percentage ticker */
+.confidence-meter {
+  --meter-bg: var(--bg-surface);
+  --meter-fill: var(--blue-primary);
+  --meter-width: 0%;
+}
+
+/* Signal chips / warning tags */
+.signal-chip {
+  --chip-bg: var(--bg-surface-raised);
+  --chip-text: var(--text-secondary);
+  --chip-border: var(--border-subtle);
+  padding: 2px 8px;
+  border-radius: 0;
+  font-size: var(--font-scale-xs);
+  font-weight: 500;
+}
+
+/* Signal list staggered entrance */
+.signal-list > * {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: signalReveal 0.5s ease forwards;
+}
+
+.signal-list > *:nth-child(1) { animation-delay: 0s; }
+.signal-list > *:nth-child(2) { animation-delay: 0.06s; }
+.signal-list > *:nth-child(3) { animation-delay: 0.12s; }
+.signal-list > *:nth-child(4) { animation-delay: 0.18s; }
+.signal-list > *:nth-child(5) { animation-delay: 0.24s; }
+
+@keyframes signalReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Copy / Share action buttons */
+.action-btn-tooltip {
+  position: relative;
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.action-btn-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: var(--bg-surface-raised);
+  color: var(--text-primary);
+  border-radius: 4px;
+  font-size: var(--font-scale-xs);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.action-btn-tooltip:hover::after {
+  opacity: 1;
+}

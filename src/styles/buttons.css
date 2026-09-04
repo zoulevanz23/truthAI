@@ -1,0 +1,113 @@
+/* ============================================================
+   Buttons — TruthCheck AI Dark Security Tool Aesthetic
+   ============================================================ */
+
+/* Base button styles — extend .btn from Bootstrap with our tokens */
+.btn {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: var(--font-scale-sm);
+  transition: all 0.15s ease;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+/* Primary button — blue with glow */
+.btn-primary {
+  --btn-bg: var(--blue-primary);
+  --btn-text: var(--white);
+  --btn-hover-bg: var(--blue-glow);
+  --btn-active-transform: scale(0.98);
+  --btn-focus-shadow: 0 0 12px rgba(46, 94, 255, 0.4);
+}
+
+.btn-primary:hover {
+  --btn-bg: var(--blue-glow);
+  color: var(--bg-void);
+  box-shadow: var(--btn-focus-shadow);
+}
+
+.btn-primary:active {
+  transform: var(--btn-active-transform);
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid var(--blue-primary);
+  outline-offset: 2px;
+}
+
+/* Secondary outline button */
+.btn-outline {
+  --btn-bg: transparent;
+  --btn-border: var(--border-subtle);
+  --btn-text: var(--text-secondary);
+  --btn-hover-bg: var(--bg-surface);
+  --btn-hover-border: var(--border-strong);
+  --btn-active-bg: var(--bg-surface-raised);
+}
+
+.btn-outline:hover {
+  --btn-bg: var(--bg-surface);
+  --btn-border: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.btn-outline:active {
+  --btn-bg: var(--bg-surface-raised);
+}
+
+/* Danger/scam button */
+.btn-danger {
+  --btn-bg: var(--verdict-scam);
+  --btn-text: var(--white);
+  --btn-hover-bg: #f21f1f;
+}
+
+.btn-danger:hover {
+  --btn-bg: #f21f1f;
+}
+
+/* Submit-style full-width button */
+.btn-full {
+  width: 100%;
+  padding: var(--spacing-md) 0;
+}
+
+/* ============================================================
+   Loading / Scanning state button
+   ============================================================ */
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.btn-loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--white);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   Focus states — all interactive elements
+   ============================================================ */
+*:focus-visible {
+  outline: 2px solid var(--blue-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Disabled state
+   ============================================================ */
+[disabled] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
