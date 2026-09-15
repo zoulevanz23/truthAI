@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TruthCheck AI</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/core@7/babel.min.js"></script>
+  <script src="https://unpkg.com/@babel/preset-react@7/babel.min.js"></script>
+  <link rel="stylesheet" href="/src/popup.css">
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module">
+    import React from 'https://unpkg.com/react@18/umd/react.production.min.js';
+    import ReactDOM from 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js';
+    
+    // Simple inline component for the popup
+    const App = () => {
+      return React.createElement('div', null,
+        React.createElement('h3', null, 'TruthCheck AI'),
+        React.createElement('p', null, 'Extension active'),
+        React.createElement('button', {
+          onclick: () => {
+            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+              if (tabs[0]) {
+                chrome.tabs.sendMessage(tabs[0].id, { type: 'toggle-panel' });
+              }
+            });
+          }
+        }, 'Open Panel')
+      );
+    };
+    
+    ReactDOM.render(React.createElement(App), document.getElementById('root'));
+  </script>
+</body>
+</html>

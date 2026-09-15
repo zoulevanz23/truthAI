@@ -1,0 +1,63 @@
+/// Prisma schema for User Accounts (Phase 1)
+/// Supersedes ADR-008 (no DB) — new ADR-011 authorizes database for user accounts
+/// Analysis content is opt-in: users can choose to store raw content or store only hash
+
+generator client {
+  provider = "postgresql"
+  output   = "./node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String?   // hashed; null if OAuth-only
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  analyses      Analysis[]
+  apiKeys       ApiKey[]
+  settings      UserSettings?
+}
+
+model Analysis {
+  id            String    @id @default(cuid())
+  userId        String?   // nullable for anonymous users who opt-in later
+  user          User?     @relation(fields: [userId], references: [id])
+
+  // Content — opt-in storage
+  content       String?   // raw text; NULL if user declined storage
+  contentHash   String?   // SHA-256 of content; enables dedup without storing raw text
+  type          String    // message/link/news/document
+  verdict       String    // SAFE/SUSPICIOUS/SCAM/TRUSTWORTHY/QUESTIONABLE/LIKELY_FAKE
+  confidence    Int       // 0-100
+  explanation   String
+  signals       String[]
+  createdAt     DateTime  @default(now())
+}
+
+model ApiKey {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  key           String    @unique // 32-char base64 key
+  name          String
+  createdAt     DateTime  @default(now())
+  lastUsed      DateTime?
+  expiresAt     DateTime? // optional rotation
+}
+
+model UserSettings {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  preferences   Json      // UI theme, analysis defaults, opt-ins
+  consentGiven  DateTime? // GDPR consent timestamp
+  dataRetentionUntil DateTime? // optional auto-deletion
+}
