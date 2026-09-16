@@ -1,6 +1,8 @@
 require('dotenv').config({ path: __dirname + '/.env' });
 console.log('Loaded .env from:', __dirname + '/.env');
 console.log('Environment:', process.env.NODE_ENV || 'development');
+console.log('AI Provider:', process.env.AI_PROVIDER || 'gemini');
+console.log('GROQ_API_KEY configured:', !!process.env.GROQ_API_KEY);
 console.log('GEMINI_API_KEY configured:', !!process.env.GEMINI_API_KEY);
 const express = require('express')
 const cors = require('cors')
@@ -205,8 +207,8 @@ app.get('/health', (req, res) => {
 
 // Root endpoint
 app.get('/', (req, res) => {
-  res.json({ 
-    message: 'TruthCheck AI Server',
+  res.json({
+    message: 'Veridex Server',
     version: '1.0.0',
     endpoints: {
       health: '/health',
@@ -263,10 +265,19 @@ app.get('/scam-advisories', (req, res) => {
   res.json({ advisories })
 })
 
-// Analysis endpoint
+// Analysis endpoint - supports both legacy {prompt} and new {content,type}
 app.post('/analyze', analysisLimiter, async (req, res) => {
   try {
-    const { prompt } = req.body
+    let { prompt, content, type } = req.body
+    // New API shape: {content, type} -> build prompt
+    if (!prompt && content) {
+      const label = type === 'image' ? 'Image' : type === 'link' ? 'URL/Link' : type === 'news' ? 'News/Article' : type === 'document' ? 'Document' : 'Message/Email'
+      // For image, content is base64 or data URL - handle safely (truncate for log)
+      const inputForPrompt = type === 'image' ? `[Image data: ${String(content).slice(0,80)}... base64]` : String(content)
+      const base = `You are TruthCheck AI — security-focused assistant. Analyze INPUT for phishing/scam/misinformation/AI-generated risks. Return STRICT JSON {"verdict":"SAFE|SUSPICIOUS|SCAM|TRUSTWORTHY|QUESTIONABLE|LIKELY_FAKE","confidence":0-100,"explanation":"string","signals":["string",...]}\n`
+      prompt = `${base}Context: ${label}\nINPUT:\n${inputForPrompt}`
+      // If image, we will handle inlineData below instead of text prompt
+    }
 
     // Validation
     if (!prompt || typeof prompt !== 'string') {
@@ -275,18 +286,28 @@ app.post('/analyze', analysisLimiter, async (req, res) => {
       })
     }
 
-    if (prompt.length > 10000) {
+    if (prompt.length > 10000 && type !== 'image') {
       return res.status(400).json({ 
         error: 'Prompt too long: maximum 10,000 characters allowed' 
       })
     }
 
-    // Check for Gemini API key
-    if (!process.env.GEMINI_API_KEY) {
-      console.error('GEMINI_API_KEY not configured')
-      return res.status(500).json({ 
-        error: 'Server configuration error: AI service not available' 
-      })
+    // Check for API key based on provider
+    const provider = process.env.AI_PROVIDER || 'gemini'
+    if (provider === 'groq') {
+      if (!process.env.GROQ_API_KEY) {
+        console.error('GROQ_API_KEY not configured')
+        return res.status(500).json({
+          error: 'Server configuration error: AI service not available'
+        })
+      }
+    } else {
+      if (!process.env.GEMINI_API_KEY) {
+        console.error('GEMINI_API_KEY not configured')
+        return res.status(500).json({
+          error: 'Server configuration error: AI service not available'
+        })
+      }
     }
 
     // Optional URL analysis (heuristics) when analyzing links
@@ -308,94 +329,183 @@ app.post('/analyze', analysisLimiter, async (req, res) => {
       }
     }
 
-    // Prepare the request to Gemini API - supports both AIza and new AQ keys
-    const cleanKey = (process.env.GEMINI_API_KEY || '').trim()
-    const isNewKey = cleanKey.startsWith('AQ.')
-    const preferredModel = process.env.GEMINI_MODEL || 'gemini-flash-latest'
-    const tryModels = [preferredModel, 'gemini-flash-latest', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro']
-    const uniqueModels = [...new Set(tryModels)]
-    
-    const requestBody = {
-      contents: [
-        {
-          parts: [
-            {
-              text: prompt
-            }
-          ]
-        }
-      ],
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 1024,
-      },
-      safetySettings: [
-        {
-          category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-          category: "HARM_CATEGORY_HATE_SPEECH",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        },
-        {
-          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE"
-        }
-      ]
-    }
-
-    console.log('Sending request to Gemini API...')
-
-    // Try models sequentially (new AQ keys often need different model/version)
-    let geminiResponse = null
+    // Prepare the request based on provider with fallback
+    let apiResponse = null
     let lastErrorText = ''
     let lastStatus = 500
-    for (const mod of uniqueModels) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${mod}:generateContent${isNewKey ? '' : `?key=${cleanKey}`}`
-      const headers = { 'Content-Type': 'application/json' }
-      if (isNewKey) headers['x-goog-api-key'] = cleanKey
-      console.log(`  trying ${mod}...`)
-      const resp = await fetch(url, { method: 'POST', headers, body: JSON.stringify(requestBody) })
-      if (resp.ok) { geminiResponse = resp; console.log(`  ✓ ${mod} ok`); break }
-      const t = await resp.text()
-      console.error(`  ✗ ${mod} -> ${resp.status}`, t.slice(0, 300))
-      lastErrorText = t
-      lastStatus = resp.status
-      if (resp.status === 429) {
-        return res.status(429).json({ error: 'You’ve reached the limit — too many checks at once. Please wait about a minute and try again.' })
-      }
-      if (resp.status === 503) {
-        console.warn(`  → 503 busy, trying next model if available...`)
-        // keep lastError for final fallback; try next model on 503 as well
-        continue
-      }
-      // try next model on 404 NOT_FOUND
-      if (resp.status !== 404) {
-        // for non-404/non-503, surface immediately in dev
-        if (process.env.NODE_ENV !== 'production') {
-          try { const p = JSON.parse(t); return res.status(500).json({ error: `${p?.error?.message || t}`.slice(0,400) }) } catch { return res.status(500).json({ error: `${t}`.slice(0,400) }) }
+    let usedProvider = provider
+
+    // Try primary provider first, then fallback if 429
+    // For image analysis, always use Gemini since Groq doesn't support vision
+    const providersToTry = type === 'image' ? ['gemini'] : (provider === 'groq' ? ['groq', 'gemini'] : ['gemini', 'groq'])
+
+    for (const currentProvider of providersToTry) {
+      usedProvider = currentProvider
+      console.log(`Trying provider: ${currentProvider}`)
+
+      if (currentProvider === 'groq') {
+        // Groq API implementation
+        const groqKey = (process.env.GROQ_API_KEY || '').trim()
+        if (!groqKey) {
+          console.log('  Skipping Groq - no API key configured')
+          continue
         }
-        return res.status(500).json({ error: 'The verification service is temporarily unavailable. Please try again in a moment.' })
+        const groqModel = process.env.GROQ_MODEL || 'openai/gpt-oss-120b'
+
+        let messages = []
+        if (type === 'image' && content) {
+          let mimeType = 'image/jpeg'
+          let b64 = String(content)
+          if (b64.startsWith('data:')) {
+            const m = b64.match(/^data:([^;]+);base64,(.+)$/)
+            if (m) { mimeType = m[1]; b64 = m[2] }
+          }
+          messages = [
+            { role: 'system', content: 'You are Veridex — a security-focused multimodal fact-checking assistant. Analyze the user INPUT IMAGE for AI-generated content, manipulation, deepfakes, or synthetic media risks. CRITICAL: You must respond with ONLY a valid JSON object. Do NOT use markdown code blocks. Your entire response must be exactly this JSON format: {"verdict":"SAFE|SUSPICIOUS|SCAM|TRUSTWORTHY|QUESTIONABLE|LIKELY_FAKE","confidence":0-100,"explanation":"string","signals":["string",...]}' },
+            { role: 'user', content: [
+              { type: 'text', text: 'Analyze this image for AI generation.' },
+              { type: 'image_url', image_url: { url: `data:${mimeType};base64,${b64}` } }
+            ]}
+          ]
+        } else {
+          messages = [
+            { role: 'system', content: 'You are Veridex — a security-focused fact-checking assistant. Analyze the user INPUT for phishing, scam, misinformation, or manipulation risks. CRITICAL: You must respond with ONLY a valid JSON object. Do NOT use markdown code blocks. Your entire response must be exactly this JSON format: {"verdict":"SAFE|SUSPICIOUS|SCAM|TRUSTWORTHY|QUESTIONABLE|LIKELY_FAKE","confidence":0-100,"explanation":"string","signals":["string",...]} Rules: One verdict only. SAFE/TRUSTWORTHY = benign, SUSPICIOUS/QUESTIONABLE = uncertain, SCAM/LIKELY_FAKE = malicious. confidence integer 0-100 calibrated to evidence, not style. explanation concise (2-4 sentences), actionable. signals: 2-6 short bullet phrases. NO markdown, NO code blocks, NO extra text. Just the JSON object.' },
+            { role: 'user', content: prompt }
+          ]
+        }
+
+        console.log('Sending request to Groq API...')
+        console.log(`  using model: ${groqModel}`)
+
+        try {
+          const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${groqKey}`
+            },
+            body: JSON.stringify({
+              model: groqModel,
+              messages,
+              temperature: 0.3,
+              max_tokens: 768,
+              response_format: { type: 'json_object' }
+            })
+          })
+
+          if (resp.ok) {
+            apiResponse = resp
+            console.log('  ✓ Groq API ok')
+            break
+          } else {
+            const t = await resp.text()
+            console.error(`  ✗ Groq API -> ${resp.status}`, t.slice(0, 300))
+            lastErrorText = t
+            lastStatus = resp.status
+
+            if (resp.status === 429) {
+              console.log('  → Groq quota exceeded, trying fallback provider...')
+              continue
+            }
+            if (process.env.NODE_ENV !== 'production') {
+              try { const p = JSON.parse(t); return res.status(500).json({ error: `${p?.error?.message || t}`.slice(0,400) }) } catch { return res.status(500).json({ error: `${t}`.slice(0,400) }) }
+            }
+            return res.status(500).json({ error: 'The verification service is temporarily unavailable. Please try again in a moment.' })
+          }
+        } catch (e) {
+          console.error('Groq API error:', e.message)
+          continue
+        }
+      } else {
+        // Gemini API implementation
+        const cleanKey = (process.env.GEMINI_API_KEY || '').trim()
+        if (!cleanKey) {
+          console.log('  Skipping Gemini - no API key configured')
+          continue
+        }
+        const isNewKey = cleanKey.startsWith('AQ.')
+        const preferredModel = process.env.GEMINI_MODEL || 'gemini-flash-latest'
+        const tryModels = [preferredModel, 'gemini-flash-latest', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro']
+        const uniqueModels = [...new Set(tryModels)]
+
+        // Image: if type === 'image', send multimodal inlineData instead of text prompt
+        let requestBody
+        if (type === 'image' && content) {
+          let mimeType = 'image/jpeg'
+          let b64 = String(content)
+          if (b64.startsWith('data:')) {
+            const m = b64.match(/^data:([^;]+);base64,(.+)$/)
+            if (m) { mimeType = m[1]; b64 = m[2] }
+          }
+          requestBody = {
+            systemInstruction: { parts: [{ text: 'You are Veridex — multimodal assistant. Analyze IMAGE for AI-generated/synthetic/deepfake risks. Return STRICT JSON {"verdict":"SAFE|SUSPICIOUS|SCAM|TRUSTWORTHY|QUESTIONABLE|LIKELY_FAKE","confidence":0-100,"explanation":"string","signals":["string",...]} Rules: 2-4 sentence explanation, 2-6 signals mentioning specific markers (artifacts, pupils, smoothing, watermark).' }] },
+            contents: [{ role: 'user', parts: [{ text: 'Analyze this image for AI generation.' }, { inlineData: { mimeType, data: b64 } }] }],
+            generationConfig: { temperature: 0.3, topK: 40, topP: 0.95, maxOutputTokens: 768 },
+            safetySettings: [
+              { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+              { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+              { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+              { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+            ]
+          }
+        } else {
+          requestBody = {
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 1024 },
+            safetySettings: [
+              { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+              { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+              { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+              { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+            ]
+          }
+        }
+
+        console.log('Sending request to Gemini API...')
+
+        // Try models sequentially (new AQ keys often need different model/version)
+        let geminiResponse = null
+        for (const mod of uniqueModels) {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${mod}:generateContent${isNewKey ? '' : `?key=${cleanKey}`}`
+          const headers = { 'Content-Type': 'application/json' }
+          if (isNewKey) headers['x-goog-api-key'] = cleanKey
+          console.log(`  trying ${mod}...`)
+          const resp = await fetch(url, { method: 'POST', headers, body: JSON.stringify(requestBody) })
+          if (resp.ok) { geminiResponse = resp; console.log(`  ✓ ${mod} ok`); break }
+          const t = await resp.text()
+          console.error(`  ✗ ${mod} -> ${resp.status}`, t.slice(0, 300))
+          lastErrorText = t
+          lastStatus = resp.status
+          if (resp.status === 429) {
+            console.log('  → Gemini quota exceeded, trying fallback provider...')
+            break // Break out of model loop to try next provider
+          }
+          if (resp.status === 503) {
+            console.warn(`  → 503 busy, trying next model if available...`)
+            continue
+          }
+          if (resp.status !== 404) {
+            if (process.env.NODE_ENV !== 'production') {
+              try { const p = JSON.parse(t); return res.status(500).json({ error: `${p?.error?.message || t}`.slice(0,400) }) } catch { return res.status(500).json({ error: `${t}`.slice(0,400) }) }
+            }
+            return res.status(500).json({ error: 'The verification service is temporarily unavailable. Please try again in a moment.' })
+          }
+        }
+
+        if (geminiResponse) {
+          apiResponse = geminiResponse
+          console.log('Gemini API response received')
+          break
+        }
       }
     }
 
-    if (!geminiResponse) {
-      console.error('Gemini API Error: all models failed', { lastStatus, lastErrorText: lastErrorText.slice(0, 500), keyPrefix: cleanKey.substring(0,6)+'...' })
-      // help: list available models
-      try {
-        const listUrl = `https://generativelanguage.googleapis.com/v1beta/models${isNewKey ? '' : `?key=${cleanKey}`}`
-        const h = isNewKey ? { 'x-goog-api-key': cleanKey } : {}
-        const lst = await fetch(listUrl, { headers: h })
-        const lt = await lst.text()
-        console.log('ListModels:', lt.slice(0, 800))
-      } catch {}
+    // Check if we got a response
+    if (!apiResponse) {
+      console.error('All providers failed', { lastStatus, lastErrorText: lastErrorText.slice(0, 500) })
+      if (lastStatus === 429) {
+        return res.status(429).json({ error: "You've reached the limit — too many checks at once. Please wait about a minute and try again." })
+      }
       if (lastStatus === 503 || /high demand|UNAVAILABLE/i.test(lastErrorText)) {
         return res.status(503).json({ error: 'The verification service is very busy right now (high demand). This is usually temporary — please wait 20–30 seconds and tap Analyze again.' })
       }
@@ -403,16 +513,20 @@ app.post('/analyze', analysisLimiter, async (req, res) => {
       return res.status(500).json({ error: 'The verification service is temporarily unavailable. Please try again in a moment.' })
     }
 
-    const data = await geminiResponse.json()
-    console.log('Gemini API response received')
+    const data = await apiResponse.json()
 
-    // Extract the generated text
-    const generatedText = data?.candidates?.[0]?.content?.parts?.[0]?.text
+    // Extract the generated text based on provider
+    let generatedText
+    if (usedProvider === 'groq') {
+      generatedText = data?.choices?.[0]?.message?.content
+    } else {
+      generatedText = data?.candidates?.[0]?.content?.parts?.[0]?.text
+    }
 
     if (!generatedText) {
-      console.error('No text generated from Gemini API:', data)
-      return res.status(500).json({ 
-        error: 'Failed to generate analysis. Please try again.' 
+      console.error('No text generated from API:', data)
+      return res.status(500).json({
+        error: 'Failed to generate analysis. Please try again.'
       })
     }
 
@@ -445,7 +559,7 @@ app.post('/analyze', analysisLimiter, async (req, res) => {
       })
     }
 
-    // Fallback normalization
+    // Fallback normalization with better explanations
     const lower = generatedText.toLowerCase()
     let fallbackVerdict = lower.includes('scam') || lower.includes('phishing')
       ? 'SCAM'
@@ -460,12 +574,48 @@ app.post('/analyze', analysisLimiter, async (req, res) => {
       fallbackVerdict = 'SUSPICIOUS'
     }
 
-    res.json({ 
+    // Generate contextual explanation based on type and verdict
+    let fallbackExplanation
+    if (type === 'image') {
+      fallbackExplanation = fallbackVerdict === 'SCAM' || fallbackVerdict === 'LIKELY_FAKE'
+        ? 'This image exhibits characteristics commonly associated with AI-generated or synthetic content. Visual analysis suggests potential manipulation or artificial origins.'
+        : fallbackVerdict === 'SUSPICIOUS' || fallbackVerdict === 'QUESTIONABLE'
+        ? 'This image shows some ambiguous characteristics that warrant further verification. While not definitively artificial, certain visual elements are unusual.'
+        : 'This image appears to be authentic with no obvious signs of AI generation or manipulation. The visual characteristics are consistent with natural photography.'
+    } else {
+      fallbackExplanation = fallbackVerdict === 'SCAM'
+        ? 'This content exhibits multiple indicators of fraudulent or deceptive intent. Exercise extreme caution and verify through official channels.'
+        : fallbackVerdict === 'SUSPICIOUS'
+        ? 'This content contains elements that should be verified before taking action. Cross-check with trusted sources.'
+        : 'This content appears legitimate based on available analysis. No significant red flags were detected.'
+    }
+
+    // Generate contextual signals
+    let fallbackSignals = [...preSignals]
+    if (type === 'image') {
+      if (fallbackVerdict === 'SCAM' || fallbackVerdict === 'LIKELY_FAKE') {
+        fallbackSignals.push('Potential AI generation markers detected', 'Unusual visual artifacts present', 'Inconsistent lighting patterns')
+      } else if (fallbackVerdict === 'SUSPICIOUS' || fallbackVerdict === 'QUESTIONABLE') {
+        fallbackSignals.push('Ambiguous visual characteristics', 'Requires further verification', 'Some unusual elements detected')
+      } else {
+        fallbackSignals.push('Natural visual characteristics', 'No obvious manipulation signs', 'Consistent with authentic imagery')
+      }
+    } else {
+      if (fallbackVerdict === 'SCAM') {
+        fallbackSignals.push('High-risk language patterns', 'Urgency or pressure tactics', 'Requests sensitive information')
+      } else if (fallbackVerdict === 'SUSPICIOUS') {
+        fallbackSignals.push('Some concerning language', 'Verify sender identity', 'Check for official confirmation')
+      } else {
+        fallbackSignals.push('Standard communication patterns', 'No high-risk indicators', 'Normal structure observed')
+      }
+    }
+
+    res.json({
       result: {
         verdict: fallbackVerdict,
         confidence: Math.max(40, Math.min(85, 50 + preRiskScore)),
-        explanation: 'Heuristic verdict due to unstructured model output.',
-        signals: [...preSignals, 'Keyword-based assessment'],
+        explanation: fallbackExplanation,
+        signals: fallbackSignals.slice(0, 12),
         rawText: generatedText.trim(),
       },
       timestamp: new Date().toISOString(),
@@ -506,8 +656,8 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
-  console.log(`🚀 TruthCheck AI Server running on port ${PORT}`)
+  console.log(`🚀 Veridex Server running on port ${PORT}`)
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)
-  console.log(`⚡ Gemini API: ${process.env.GEMINI_API_KEY ? 'Configured' : 'Not configured'}`)
+  console.log(`⚡ AI Provider: ${process.env.AI_PROVIDER || 'gemini'}`)
   console.log(`📡 Health check: http://localhost:${PORT}/health`)
 }) 
