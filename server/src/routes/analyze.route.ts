@@ -4,7 +4,9 @@ import { validateAnalyze } from '../middleware/validate';
 import { analyzeUrlHeuristics, extractUrlFromInput } from '../services/heuristics.service';
 import { checkDomainReputation } from '../services/reputation.service';
 import { callGemini } from '../services/gemini.service';
+import { callGroq } from '../services/groq.service';
 import { logger } from '../utils/logger';
+import { env } from '../config/env';
 
 const router = Router();
 
@@ -17,7 +19,7 @@ export const analysisLimiter = rateLimit({
 });
 
 router.post('/analyze', analysisLimiter, validateAnalyze, async (req, res) => {
-  const { content, type } = req.body as { content: string; type: 'message'|'link'|'news'|'document' };
+  const { content, type } = req.body as { content: string; type: 'message'|'link'|'news'|'document'|'image' };
 
   // Heuristics enrichment for link type
   let preSignals: string[] = [];
@@ -35,7 +37,12 @@ router.post('/analyze', analysisLimiter, validateAnalyze, async (req, res) => {
   }
 
   try {
-    const result = await callGemini(content, type);
+    // Use Gemini for image analysis (vision support), otherwise use configured provider
+    const result = type === 'image'
+      ? await callGemini(content, type)
+      : env.AI_PROVIDER === 'groq'
+        ? await callGroq(content, type)
+        : await callGemini(content, type);
 
     // bias: if heuristics show risk but LLM says SAFE, downgrade
     let verdict = result.verdict;
@@ -55,12 +62,12 @@ router.post('/analyze', analysisLimiter, validateAnalyze, async (req, res) => {
     });
   } catch (e: any) {
     const status = e.status || 500;
-    const msg = e.message || 'Internal server error';
+    const msg = e.message || 'Something went wrong while verifying your content. Please try again.';
     logger.error({ err: e, status }, 'analyze failed');
     if (status === 429) return res.status(429).json({ error: 'You’ve reached the limit — too many checks at once. Please wait about a minute and try again.' });
     if (status === 503) return res.status(503).json({ error: msg });
     if (status === 504) return res.status(504).json({ error: 'Request timeout. Please try again.' });
-    return res.status(status).json({ error: msg });
+    return res.status(status).json({ error: env.NODE_ENV !== 'production' ? msg : 'Something went wrong while verifying your content. Please try again.' });
   }
 });
 
