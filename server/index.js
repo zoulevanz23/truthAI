@@ -337,6 +337,7 @@ app.post('/analyze', analysisLimiter, async (req, res) => {
 
     // Try primary provider first, then fallback if 429
     // For image analysis, always use Gemini since Groq doesn't support vision
+    // Groq models lack multimodal capabilities for image analysis
     const providersToTry = type === 'image' ? ['gemini'] : (provider === 'groq' ? ['groq', 'gemini'] : ['gemini', 'groq'])
 
     for (const currentProvider of providersToTry) {
